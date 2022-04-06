@@ -216,6 +216,18 @@ inline size_t DynamicArray<T>::getCapacity() const
 }
 
 template<class T>
+inline size_t DynamicArray<T>::getInitCap() const
+{
+	return INITIAL_CAPACITY;
+}
+
+template<class T>
+inline float DynamicArray<T>::getResizeFactor() const
+{
+	return RESIZE_FACTOR;
+}
+
+template<class T>
 inline void DynamicArray<T>::increase_capacity(size_t newCapacity)
 {
 	if (capacity < newCapacity) {

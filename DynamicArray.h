@@ -85,7 +85,7 @@ public:
 	/**
 	* \brief Access the last element
 	*
-	* Returns a const reference to the element at index size - 1
+	* Returns a reference to the element at index size - 1
 	* If the array is empty, the behaviour is undefined
 	*/
 	T& back();
@@ -161,6 +161,11 @@ public:
 	size_t getSize() const;
 	//! Return capacity
 	size_t getCapacity() const;
+
+	//! Return the initial capacity value 
+	size_t getInitCap() const;
+	//! Return the resizing factor value
+	float getResizeFactor() const;
 
 private:
 
