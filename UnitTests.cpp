@@ -3,34 +3,103 @@
 #include "catch.hpp"
 #include "DynamicArray.h"
 
-TEST_CASE("Initialization") {
-	
+#include <vector>
+
+TEST_CASE("Default constructed array has correct properties")
+{
 	DynamicArray<int> dArr;
-	REQUIRE(dArr.getSize() == 0);
-	REQUIRE(dArr.getCapacity() == 0);
 
-	DynamicArray<int> dArr2{ 4, 5, 6, 8 };
-	REQUIRE(dArr2.getSize() == 4);
-	REQUIRE(dArr2.getCapacity() == 4);
-	REQUIRE(dArr2[0] == 4);
-	REQUIRE(dArr2[1] == 5);
-	REQUIRE(dArr2[2] == 6);
-	REQUIRE(dArr2[3] == 8);
-
-	DynamicArray<int> dArr3(dArr2);
-	REQUIRE(dArr3.getSize() == 4);
-	REQUIRE(dArr3.getCapacity() == 4);
-	REQUIRE(dArr3[0] == 4);
-	REQUIRE(dArr3[1] == 5);
-	REQUIRE(dArr3[2] == 6);
-	REQUIRE(dArr3[3] == 8);
-
-	DynamicArray<int> dArr4(10);
-	REQUIRE(dArr4.getSize() == 0);
-	REQUIRE(dArr4.getCapacity() == 10);
-
-
+	SECTION("getSize() returns 0")
+	{
+		REQUIRE(dArr.getSize() == 0);
+	}
+	SECTION("getCapacity() returns 0")
+	{
+		REQUIRE(dArr.getCapacity() == 0);
+	}
 }
+
+void requireSameContents(DynamicArray<int>& da, std::vector<int> v)
+{
+	for (size_t i = 0; i < v.size(); ++i)
+		REQUIRE(da[i] == v[i]);
+}
+
+TEST_CASE("Initialization list constructed object has correct properties")
+{
+	DynamicArray<int> dArr{ 4, 5, 6, 8 };
+	std::vector<int> expected{ 4,5,6,8 };
+
+	SECTION("getSize() returns 4")
+	{
+		REQUIRE(dArr.getSize() == 4);
+	}
+	SECTION("getCapacity() returns 4")
+	{
+		REQUIRE(dArr.getCapacity() == 4);
+	}
+	SECTION("Elements are stored correctly")
+	{
+		requireSameContents(dArr, expected);
+	}
+}
+
+TEST_CASE("Copy-constructed dynamic array has correct properties")
+{
+	DynamicArray<int> original{ 4, 5, 6, 8 };
+	DynamicArray<int> copy(original);
+	std::vector<int> expected{ 4,5,6,8 };
+
+	SECTION("getSize() returns 4")
+	{
+		REQUIRE(copy.getSize() == 4);
+	}
+	SECTION("getCapacity() returns 4")
+	{
+		REQUIRE(copy.getCapacity() == 4);
+	}
+	SECTION("Elements are stored correctly")
+	{
+		requireSameContents(copy, expected);
+	}
+}
+
+TEST_CASE("Dynamic array constructed with specific size has correct properties") {
+	DynamicArray<int> dArr(10);
+	REQUIRE(dArr.getSize() == 0);
+	REQUIRE(dArr.getCapacity() == 10);
+}
+
+TEST_CASE("at() correctly returns the contents of the array")
+{
+	DynamicArray<int> da{ 4, 5, 6, 8 };
+	std::vector<int> expected{ 4,5,6,8 };
+	for (size_t i = 0; i < expected.size(); ++i)
+		REQUIRE(da.at(i) == expected.at(i));
+}
+
+TEST_CASE("at() throws when the index is out of range")
+{
+	DynamicArray<int> da{ 4, 5, 6, 8 };
+	REQUIRE_THROWS_AS(da.at(4), std::out_of_range);
+}
+
+TEST_CASE("DynamicArray::at()")
+{
+	DynamicArray<int> da{ 4, 5, 6, 8 };
+
+	SECTION("The elements of the array are returned correctly")
+	{
+		std::vector<int> expected{ 4,5,6,8 };
+		for (size_t i = 0; i < expected.size(); ++i)
+			REQUIRE(da.at(i) == expected.at(i));
+	}
+	SECTION("When the index is out of range, an exception is thrown")
+	{
+		REQUIRE_THROWS_AS(da.at(4), std::out_of_range);
+	}
+}
+
 
 TEST_CASE("Test Resize") {
 	

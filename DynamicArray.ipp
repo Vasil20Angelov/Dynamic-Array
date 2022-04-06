@@ -112,7 +112,7 @@ inline void DynamicArray<T>::push_back(const T& element)
 {
 	if (size == capacity) {
 
-		size_t newCapacity = std::floor(capacity * RESIZE_FACTOR);
+		size_t newCapacity = (size_t)std::floor(capacity * RESIZE_FACTOR);
 		if (newCapacity < INITIAL_CAPACITY)
 			newCapacity = INITIAL_CAPACITY;
 
@@ -151,7 +151,7 @@ inline void DynamicArray<T>::resize(size_t newSize, const T& value)
 	resize(newSize);
 
 	if (oldSize < size) {
-		for (int i = oldSize; i < size; ++i)
+		for (size_t i = oldSize; i < size; ++i)
 			data[i] = value;
 	}
 }
