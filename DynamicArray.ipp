@@ -178,23 +178,15 @@ inline void DynamicArray<T>::shrink_to_fit()
 		temp = new T[size];
 		for (int i = 0; i < size; ++i)
 			temp[i] = data[i];
-
-		delete[] data;
-		data = new T[size];
-
-		for (int i = 0; i < size; ++i)
-			data[i] = temp[i];
-
-		capacity = size;
-		delete[] temp;
 	}
 	catch (std::exception& e) {
-
-		if (temp)
-			delete[] temp;
-		clear();
+		delete[] temp;
 		throw e;
 	}
+
+	std::swap(data, temp);
+	capacity = size;
+	delete[] temp;
 }
 
 template<class T>
@@ -231,9 +223,11 @@ template<class T>
 inline void DynamicArray<T>::increase_capacity(size_t newCapacity)
 {
 	if (capacity < newCapacity) {
+
+		capacity = newCapacity > INITIAL_CAPACITY ? newCapacity : INITIAL_CAPACITY;
 		T* temp = nullptr;
 		try {
-			temp = new T[size];
+			temp = new T[capacity];
 			for (int i = 0; i < size; ++i)
 				temp[i] = data[i];
 		}
@@ -242,21 +236,8 @@ inline void DynamicArray<T>::increase_capacity(size_t newCapacity)
 			throw e;
 		}
 
-		delete[] data;
-
-		capacity = newCapacity > INITIAL_CAPACITY ? newCapacity : INITIAL_CAPACITY;
-		try {
-			data = new T[capacity];
-			for (int i = 0; i < size; ++i)
-				data[i] = temp[i];
-
-			delete[] temp;
-		}
-		catch (std::exception& e) {
-			delete[] temp;
-			clear();
-			throw e;
-		}
+		std::swap(data, temp);
+		delete[] temp;
 	}
 }
 

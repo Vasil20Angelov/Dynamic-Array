@@ -25,6 +25,7 @@ public:
 	//! Operator =
 	DynamicArray& operator=(const DynamicArray<T>& other);
 
+	///@{
 	/**
 	* \brief Access an element at given position
 	*
@@ -32,63 +33,41 @@ public:
 	* If the position is invalid, the behaviour is undefined
 	*/
 	const T& operator[](size_t position) const;
-
-	/**
-	* \brief Access an element at given position
-	*
-	* By given position returns a reference to the element at that position
-	* If the position is invalid, the behaviour is undefined
-	*/
 	T& operator[](size_t position);
+	///@}
 
+	///@{
 	/**
 	* \brief Access an element at given position
 	* 
-	* By given position returns a const reference to the element at that position
+	* By given position returns a (const) reference to the element at that position
 	* If the position is invalid, throws an out_of_range exception
 	*/
 	const T& at(size_t position) const;
-
-	/**
-	* \brief Access an element at given position
-	*
-	* By given position returns a reference to the element at that position
-	* If the position is invalid, throws an out_of_range exception
-	*/
 	T& at(size_t position);
-
+	///@}
+	
+	///@{
 	/**
 	* \brief Access the first element
 	* 
-	* Returns a const reference to the element at index 0
+	* Returns a (const) reference to the element at index 0
 	* If the array is empty, the behaviour is undefined
 	*/
 	const T& front() const;
-
-	/**
-	* \brief Access the first element
-	*
-	* Returns a reference to the element at index 0
-	* If the array is empty, the behaviour is undefined
-	*/
 	T& front();
+	///@}
 
-
+	///@{
 	/**
 	* \brief Access the last element
 	* 
-	* Returns a const reference to the element at index size - 1
+	* Returns a (const) reference to the element at index size - 1
 	* If the array is empty, the behaviour is undefined
 	*/
 	const T& back() const;
-
-	/**
-	* \brief Access the last element
-	*
-	* Returns a reference to the element at index size - 1
-	* If the array is empty, the behaviour is undefined
-	*/
 	T& back();
+	///@}
 
 	/**
 	* \brief Add an element
