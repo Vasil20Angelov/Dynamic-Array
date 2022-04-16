@@ -1,16 +1,13 @@
 #include "DynamicArray.h"
 
 template<class T>
-inline DynamicArray<T>::DynamicArray() : data(nullptr), size(0), capacity(0)
+inline DynamicArray<T>::DynamicArray() : data(), size(0)
 {
 }
 
 template<class T>
-inline DynamicArray<T>::DynamicArray(size_t newSize)
+inline DynamicArray<T>::DynamicArray(size_t newSize) : data(newSize), size(0)
 {
-	capacity = newSize > INITIAL_CAPACITY ? newSize : INITIAL_CAPACITY;
-	data = new T[capacity];
-	size = 0;
 }
 
 template<class T>
@@ -22,28 +19,18 @@ inline DynamicArray<T>::DynamicArray(const DynamicArray& other)
 template<class T>
 inline DynamicArray<T>::DynamicArray(const std::initializer_list<T>& lst)
 {
+	size_t capacity = lst.size() > data.getInitCap() ? lst.size() : data.getInitCap();
+	
+	data.reserve(0, capacity);
+
+	size_t i = 0;
+	for (const T& element : lst)
+	{
+		data[i] = element;
+		++i;
+	}
+
 	size = lst.size();
-	capacity = size > INITIAL_CAPACITY ? size : INITIAL_CAPACITY;
-
-	try {
-		data = new T[capacity];
-		size_t i = 0;
-		for (const T& element : lst)
-		{
-			data[i] = element;
-			++i;
-		}
-	}
-	catch (std::exception& e) {
-		clear();
-		throw e;
-	}
-}
-
-template<class T>
-inline DynamicArray<T>::~DynamicArray()
-{
-	clear();
 }
 
 template<class T>
@@ -65,7 +52,7 @@ inline const T& DynamicArray<T>::operator[](size_t position) const
 template<class T>
 inline T& DynamicArray<T>::operator[](size_t position)
 {
-	return const_cast<T&>(static_cast<const DynamicArray&>(*this)[position]);
+	return const_cast<T&>(const_cast<const DynamicArray&>(*this)[position]);
 }
 
 template<class T>
@@ -80,7 +67,7 @@ inline const T& DynamicArray<T>::at(size_t position) const
 template<class T>
 inline T& DynamicArray<T>::at(size_t position)
 {
-	return const_cast<T&>(static_cast<const DynamicArray&>(*this).at(position));
+	return const_cast<T&>(const_cast<const DynamicArray&>(*this).at(position));
 }
 
 template<class T>
@@ -92,7 +79,7 @@ inline const T& DynamicArray<T>::front() const
 template<class T>
 inline T& DynamicArray<T>::front()
 {
-	return const_cast<T&>(static_cast<const DynamicArray&>(*this).front());
+	return const_cast<T&>(const_cast<const DynamicArray&>(*this).front());
 }
 
 template<class T>
@@ -104,19 +91,19 @@ inline const T& DynamicArray<T>::back() const
 template<class T>
 inline T& DynamicArray<T>::back()
 {
-	return const_cast<T&>(static_cast<const DynamicArray&>(*this).back());
+	return const_cast<T&>(const_cast<const DynamicArray&>(*this).back());
 }
 
 template<class T>
 inline void DynamicArray<T>::push_back(const T& element)
 {
-	if (size == capacity) {
+	if (size == data.getCap()) {
 
-		size_t newCapacity = (size_t)std::floor(capacity * RESIZE_FACTOR);
-		if (newCapacity < INITIAL_CAPACITY)
-			newCapacity = INITIAL_CAPACITY;
+		size_t newCapacity = (size_t)(data.getCap() * RESIZE_FACTOR);
+		if (newCapacity < data.getInitCap())
+			newCapacity = data.getInitCap();
 
-		increase_capacity(newCapacity);
+		data.reserve(size, newCapacity);
 	}
 
 	data[size] = element;
@@ -141,7 +128,7 @@ inline void DynamicArray<T>::resize(size_t newSize)
 	size = newSize;
 
 	// If newSize is less than the current capacity, it does nothing
-	increase_capacity(newSize);
+	data.reserve(oldSize, newSize);
 }
 
 template<class T>
@@ -159,34 +146,22 @@ inline void DynamicArray<T>::resize(size_t newSize, const T& value)
 template<class T>
 inline void DynamicArray<T>::reserve(size_t newCapacity)
 {
-	increase_capacity(newCapacity);
+	data.reserve(size, newCapacity);
 }
 
 template<class T>
 inline void DynamicArray<T>::shrink_to_fit()
 {
-	if (size == capacity)
+	if (size == data.getCap())
 		return;
 
 	if (size == 0) {
-		clear();
+		data.clear();
 		return;
 	}
 
-	T* temp = nullptr;
-	try {
-		temp = new T[size];
-		for (int i = 0; i < size; ++i)
-			temp[i] = data[i];
-	}
-	catch (std::exception& e) {
-		delete[] temp;
-		throw e;
-	}
-
-	std::swap(data, temp);
-	capacity = size;
-	delete[] temp;
+	Container<T> temp(data, size);
+	data.swap(temp);
 }
 
 template<class T>
@@ -204,13 +179,13 @@ inline size_t DynamicArray<T>::getSize() const
 template<class T>
 inline size_t DynamicArray<T>::getCapacity() const
 {
-	return capacity;
+	return data.getCap();
 }
 
 template<class T>
 inline size_t DynamicArray<T>::getInitCap() const
 {
-	return INITIAL_CAPACITY;
+	return data.getInitCap();
 }
 
 template<class T>
@@ -220,61 +195,24 @@ inline float DynamicArray<T>::getResizeFactor() const
 }
 
 template<class T>
-inline void DynamicArray<T>::increase_capacity(size_t newCapacity)
-{
-	if (capacity < newCapacity) {
-
-		capacity = newCapacity > INITIAL_CAPACITY ? newCapacity : INITIAL_CAPACITY;
-		T* temp = nullptr;
-		try {
-			temp = new T[capacity];
-			for (int i = 0; i < size; ++i)
-				temp[i] = data[i];
-		}
-		catch (std::exception& e) {
-			delete[] temp;
-			throw e;
-		}
-
-		std::swap(data, temp);
-		delete[] temp;
-	}
-}
-
-template<class T>
 inline void DynamicArray<T>::copy(const DynamicArray<T>& other)
 {
-	try {
-		if (capacity < other.size) {
-			if (data) {
-				delete[] data;
-			}
+	if (data.getCap() < other.size) {
+		data.clear();
 
-			data = new T[other.size];
-			capacity = other.size;
-		}
-		
-		for (int i = 0; i < other.size; ++i) {
-			data[i] = other.data[i];
-		}
+		data.reserve(0, other.size);
+	}
 
-		size = other.size;
+	for (int i = 0; i < other.size; ++i) {
+		data[i] = other.data[i];
 	}
-	catch (std::exception& e) {
-		clear();
-		throw e;
-	}
+
+	size = other.size;
 }
 
 template<class T>
 inline void DynamicArray<T>::clear()
 {
 	size = 0;
-	capacity = 0;
-
-	if (data) {
-		delete[] data;
-		data = nullptr;
-	}
+	data.clear();
 }
-

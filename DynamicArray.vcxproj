@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="catch.hpp" />
+    <ClInclude Include="Container.h" />
     <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="DynamicArray.ipp" />
   </ItemGroup>
